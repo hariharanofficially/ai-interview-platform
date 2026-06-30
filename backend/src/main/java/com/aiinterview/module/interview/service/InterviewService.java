@@ -2,6 +2,7 @@ package com.aiinterview.module.interview.service;
 
 import com.aiinterview.common.exception.ResourceNotFoundException;
 import com.aiinterview.module.auth.entity.User;
+import com.aiinterview.module.user.service.S3StorageService;
 import com.aiinterview.module.auth.repository.UserRepository;
 import com.aiinterview.module.interview.dto.InterviewQuestionResponse;
 import com.aiinterview.module.interview.dto.InterviewSessionResponse;
@@ -39,6 +40,7 @@ public class InterviewService {
     private final ResumeRepository resumeRepository;
     private final AiEngineService aiEngineService;
     private final ObjectMapper objectMapper;
+    private final S3StorageService s3StorageService;
 
     @Transactional
     public InterviewSessionResponse setupInterview(UUID userId, InterviewSetupRequest request) {
@@ -227,7 +229,7 @@ public class InterviewService {
 
         // 4. Check if session is complete (all questions answered)
         boolean allAnswered = session.getQuestions().stream()
-                .allMatch(q -> q.getScore() != null || q.getId().equals(question.getId()));
+                .allMatch(q -> q.getScore() != null || q.getId().equals(questionId));
 
         if (allAnswered) {
             session.setStatus("COMPLETED");

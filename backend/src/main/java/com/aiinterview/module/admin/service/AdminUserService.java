@@ -13,9 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,19 +27,7 @@ public class AdminUserService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
 
         Page<User> userPage = userRepository.findAll(pageable);
-
-        List<UserAdminResponse> content = userPage.getContent().stream()
-                .map(this::mapToAdminResponse)
-                .collect(Collectors.toList());
-
-        return PagedResponse.<UserAdminResponse>builder()
-                .content(content)
-                .page(userPage.getNumber())
-                .size(userPage.getSize())
-                .totalElements(userPage.getTotalElements())
-                .totalPages(userPage.getTotalPages())
-                .last(userPage.isLast())
-                .build();
+        return new PagedResponse<>(userPage.map(this::mapToAdminResponse));
     }
 
     @Transactional
